@@ -1,0 +1,21 @@
+{
+    "theme_color": "#ffffff",
+    "background_color": "#000000",
+    "display": "standalone",
+    "scope": "/",
+    "start_url": "/",
+    "name": "Snip PWA",
+    "short_name": "snip",
+    "icons": [
+        {
+            "src": "/vite.svg",
+            "sizes": "32x32",
+            "type": "image/png"
+        },
+        {
+            "src": "/favicon-144x144.png",
+            "sizes": "144x144",
+            "type": "image/png"
+        }
+    ]
+}
