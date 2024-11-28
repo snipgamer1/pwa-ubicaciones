@@ -32,6 +32,8 @@ const data = rawData ? JSON.parse(rawData) : getData()
 const Z_INDEX_SELECTED = data.length
 const Z_INDEX_HOVER = data.length + 1
 
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string
+
 function App() {
   const [markers, setMarkers] = useState([])
   const [isOpenDrawer, setIsOpenDrawer] = useState(false)
@@ -100,10 +102,7 @@ function App() {
 
   return (
     <section className="relative h-screen">
-      <APIProvider
-        apiKey={'AIzaSyCrSHiniINXEkoom2h5ULfSGPACPd64ZDg'}
-        libraries={['marker']}
-      >
+      <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={['marker']}>
         <Map
           style={{ width: '100vw', height: '95%' }}
           mapId={'bf51a910020fa25a'}
@@ -112,7 +111,6 @@ function App() {
           gestureHandling={'greedy'}
           onClick={onMapClick}
           clickableIcons={false}
-          
         >
           {markers.map(({ id, zIndex: zIndexDefault, position, type }) => {
             let zIndex = zIndexDefault
