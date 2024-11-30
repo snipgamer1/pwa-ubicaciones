@@ -101,7 +101,7 @@ function App() {
   }, [])
 
   return (
-    <section className="relative h-screen">
+    <section className="relative h-[100dvh]">
       <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={['marker']}>
         <Map
           style={{ width: '100vw', height: '95%' }}

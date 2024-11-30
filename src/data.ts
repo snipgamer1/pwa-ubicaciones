@@ -11,7 +11,7 @@ export function getData() {
   const data: MarkerData[] = []
 
   // create 10 random markers
-  for (let index = 0; index < 5; index++) {
+  for (let index = 0; index < 4; index++) {
     data.push({
       id: String(index),
       position: {

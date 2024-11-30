@@ -15,8 +15,18 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then(cache => {
-        console.log('Caching static assets');
-        return cache.addAll(urlsToCache);
+        return cache.addAll(urlsToCache)
+          .catch(error => {
+            console.error('Cache addAll failed:', error);
+            // Log which specific files failed
+            return Promise.all(
+              urlsToCache.map(url =>
+                cache.add(url).catch(err => 
+                  console.error('Failed to cache:', url, err)
+                )
+              )
+            );
+          });
       })
       .then(() => self.skipWaiting())
   );
@@ -48,10 +58,14 @@ self.addEventListener('fetch', event => {
         .then(cache => {
           return fetch(event.request)
             .then(networkResponse => {
-              cache.put(event.request, networkResponse.clone());
-              return networkResponse;
+              if (networkResponse.ok) {
+                cache.put(event.request, networkResponse.clone());
+                return networkResponse;
+              }
+              throw new Error('Network response was not ok');
             })
-            .catch(() => {
+            .catch(error => {
+              console.error('Fetching failed:', error);
               return cache.match(event.request);
             });
         })
