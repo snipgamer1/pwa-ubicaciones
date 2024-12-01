@@ -15,6 +15,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then(cache => {
+        console.log('Cache opened');
         return cache.addAll(urlsToCache)
           .catch(error => {
             console.error('Cache addAll failed:', error);
@@ -51,41 +52,42 @@ self.addEventListener('activate', event => {
 
 // Fetch Event
 self.addEventListener('fetch', event => {
-  // Handle Google Maps requests
+  // Manejar solicitudes de Google Maps
   if (event.request.url.includes('maps.googleapis.com') || event.request.url.includes('maps.gstatic.com')) {
     event.respondWith(
       caches.open(MAPS_CACHE)
         .then(cache => {
           return fetch(event.request)
             .then(networkResponse => {
-              if (networkResponse.ok) {
+              if (event.request.method === 'GET') {
                 cache.put(event.request, networkResponse.clone());
-                return networkResponse;
               }
-              throw new Error('Network response was not ok');
+              return networkResponse;
             })
-            .catch(error => {
-              console.error('Fetching failed:', error);
-              return cache.match(event.request);
-            });
+            .catch(() => cache.match(event.request));
         })
     );
     return;
   }
 
-  // Handle other requests
+  // Manejar otras solicitudes
   event.respondWith(
     caches.match(event.request)
       .then(response => {
         if (response) {
-          return response;
+          return response; // Retorna desde la caché si está disponible
+        }
+
+        if (event.request.method !== 'GET') {
+          // Si no es GET, simplemente pasa la solicitud al network
+          return fetch(event.request);
         }
 
         const fetchRequest = event.request.clone();
         return fetch(fetchRequest)
           .then(response => {
             if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
+              return response; // No cacheamos respuestas no válidas
             }
 
             const responseToCache = response.clone();
@@ -93,6 +95,7 @@ self.addEventListener('fetch', event => {
               .then(cache => {
                 cache.put(event.request, responseToCache);
               });
+
             return response;
           })
           .catch(() => {
